@@ -48,80 +48,80 @@ final: $(BIND)/$(NAME)
 
 $(OBJD)/%.o: %.c
 	@echo "building object $@"
-	@mkdir -p $(@D)
-	@$(CC) $(INCL) $(FLAGS) -c -o $@ $<
+	mkdir -p $(@D)
+	$(CC) $(INCL) $(FLAGS) -c -o $@ $<
 
 $(SUBD)/termbox_next/bin/termbox.a:
 	@echo "building static object $@"
-	@(cd $(SUBD)/termbox_next && $(MAKE))
+	(cd $(SUBD)/termbox_next && $(MAKE))
 
 $(BIND)/$(NAME): $(SRCS_OBJS)
 	@echo "compiling executable $@"
-	@mkdir -p $(@D)
-	@$(CC) -o $@ $^ $(LINK)
+	mkdir -p $(@D)
+	$(CC) -o $@ $^ $(LINK)
 
 run:
-	@cd $(BIND) && $(CMD)
+	cd $(BIND) && $(CMD)
 
 leak: leakgrind
 leakgrind: $(BIND)/$(NAME)
-	@rm -f valgrind.log
-	@cd $(BIND) && valgrind $(VALGRIND) 2> ../valgrind.log $(CMD)
-	@less valgrind.log
+	rm -f valgrind.log
+	cd $(BIND) && valgrind $(VALGRIND) 2> ../valgrind.log $(CMD)
+	less valgrind.log
 
 install: $(BIND)/$(NAME)
 	@echo "installing"
-	@install -dZ ${DESTDIR}/etc/ly
-	@install -DZ $(BIND)/$(NAME) -t ${DESTDIR}/usr/bin
-	@install -DZ $(RESD)/config.ini -t ${DESTDIR}/etc/ly
-	@install -DZ $(RESD)/xsetup.sh -t $(DATADIR)
-	@install -DZ $(RESD)/wsetup.sh -t $(DATADIR)
-	@install -dZ $(DATADIR)/lang
-	@install -DZ $(RESD)/lang/* -t $(DATADIR)/lang
-	@install -DZ $(RESD)/ly.service -m 644 -t ${DESTDIR}/usr/lib/systemd/system
-	@install -DZ $(RESD)/pam.d/ly -m 644 -t ${DESTDIR}/etc/pam.d
+	install -dZ ${DESTDIR}/etc/ly
+	install -DZ $(BIND)/$(NAME) -t ${DESTDIR}/usr/bin
+	install -DZ $(RESD)/config.ini -t ${DESTDIR}/etc/ly
+	install -DZ $(RESD)/xsetup.sh -t $(DATADIR)
+	install -DZ $(RESD)/wsetup.sh -t $(DATADIR)
+	install -dZ $(DATADIR)/lang
+	install -DZ $(RESD)/lang/* -t $(DATADIR)/lang
+	install -DZ $(RESD)/ly.service -m 644 -t ${DESTDIR}/usr/lib/systemd/system
+	install -DZ $(RESD)/pam.d/ly -m 644 -t ${DESTDIR}/etc/pam.d
 
 installnoconf: $(BIND)/$(NAME)
 	@echo "installing without the configuration file"
-	@install -dZ ${DESTDIR}/etc/ly
-	@install -DZ $(BIND)/$(NAME) -t ${DESTDIR}/usr/bin
-	@install -DZ $(RESD)/xsetup.sh -t $(DATADIR)
-	@install -DZ $(RESD)/wsetup.sh -t $(DATADIR)
-	@install -dZ $(DATADIR)/lang
-	@install -DZ $(RESD)/lang/* -t $(DATADIR)/lang
-	@install -DZ $(RESD)/ly.service -m 644 -t ${DESTDIR}/usr/lib/systemd/system
-	@install -DZ $(RESD)/pam.d/ly -m 644 -t ${DESTDIR}/etc/pam.d
+	install -dZ ${DESTDIR}/etc/ly
+	install -DZ $(BIND)/$(NAME) -t ${DESTDIR}/usr/bin
+	install -DZ $(RESD)/xsetup.sh -t $(DATADIR)
+	install -DZ $(RESD)/wsetup.sh -t $(DATADIR)
+	install -dZ $(DATADIR)/lang
+	install -DZ $(RESD)/lang/* -t $(DATADIR)/lang
+	install -DZ $(RESD)/ly.service -m 644 -t ${DESTDIR}/usr/lib/systemd/system
+	install -DZ $(RESD)/pam.d/ly -m 644 -t ${DESTDIR}/etc/pam.d
 
 uninstall:
 	@echo "uninstalling"
-	@rm -rf ${DESTDIR}/etc/ly
-	@rm -rf $(DATADIR)
-	@rm -f ${DESTDIR}/usr/bin/ly
-	@rm -f ${DESTDIR}/usr/lib/systemd/system/ly.service
-	@rm -f ${DESTDIR}/etc/pam.d/ly
+	rm -rf ${DESTDIR}/etc/ly
+	rm -rf $(DATADIR)
+	rm -f ${DESTDIR}/usr/bin/ly
+	rm -f ${DESTDIR}/usr/lib/systemd/system/ly.service
+	rm -f ${DESTDIR}/etc/pam.d/ly
 
 clean:
 	@echo "cleaning"
-	@rm -rf $(BIND) $(OBJD) valgrind.log
-	@(cd $(SUBD)/termbox_next && $(MAKE) clean)
+	rm -rf $(BIND) $(OBJD) valgrind.log
+	(cd $(SUBD)/termbox_next && $(MAKE) clean)
 
 remotes:
 	@echo "registering remotes"
-	@git remote add github git@github.com:nullgemm/$(NAME).git
-	@git remote add gitea ssh://git@git.nullgem.fr:2999/nullgemm/$(NAME).git
+	git remote add github git@github.com:nullgemm/$(NAME).git
+	git remote add gitea ssh://git@git.nullgem.fr:2999/nullgemm/$(NAME).git
 
 github:
 	@echo "sourcing submodules from https://github.com"
-	@cp .github .gitmodules
-	@git submodule sync
-	@git submodule update --init --remote
-	@cd $(SUBD)/argoat && make github
-	@git submodule update --init --recursive --remote
+	cp .github .gitmodules
+	git submodule sync
+	git submodule update --init --remote
+	cd $(SUBD)/argoat && make github
+	git submodule update --init --recursive --remote
 
 gitea:
 	@echo "sourcing submodules from personal server"
-	@cp .gitea .gitmodules
-	@git submodule sync
-	@git submodule update --init --remote
-	@cd $(SUBD)/argoat && make gitea
-	@git submodule update --init --recursive --remote
+	cp .gitea .gitmodules
+	git submodule sync
+	git submodule update --init --remote
+	cd $(SUBD)/argoat && make gitea
+	git submodule update --init --recursive --remote
